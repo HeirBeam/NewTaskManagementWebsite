@@ -7,7 +7,7 @@ const taskInput = document.getElementById("task-input");
 const addTaskButton = document.getElementById("add-task");
 
 let currentDate = new Date();
-let tasks = {}; // To store tasks by date
+let tasks = loadTasksFromStorage(); // To store tasks by date
 
 // Initialize Calendar
 function initCalendar() {
@@ -50,25 +50,55 @@ function renderDays(year, month) {
   // Load Tasks for Selected Day
   function loadTasksForDay(date) {
     taskList.innerHTML = "";
-    (tasks[date] || []).forEach(task => {
+    const dayTasks = tasks[date] || [];
+    dayTasks.forEach((task,index)=> {
       const li = document.createElement("li");
       li.textContent = task;
       li.classList.add("task");
+
+      //Delete button for each task
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.classList.add("delete-task");
+      deleteButton.addEventListener("click", () => deleteTask(date,index));
+      li.appendChild(deleteButton);
       taskList.appendChild(li);
     });
   }
   
   // Add Task
   addTaskButton.addEventListener("click", () => {
-    const task = taskInput.value;
+    const task = taskInput.value.trim();
     if (task) {
       const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}`;
       tasks[dateKey] = tasks[dateKey] || [];
       tasks[dateKey].push(task);
       taskInput.value = "";
+
+      //Save tasks
+      saveTasksToStorage();
       loadTasksForDay(dateKey);
     }
   });
+
+  //Delete tasks
+  function deleteTask(date,index){
+    tasks[date].splice(index, 1);
+    if(tasks[date].length ===0) delete tasks[date];
+    saveTasksToStorage();
+    loadTasksForDay(date);
+  }
   
+  //load tasks function 
+  function loadTasksFromStorage(){
+    const storedTasks = localStorage.getItem("tasks");
+    return storedTasks ? JSON.parse(storedTasks) : {};
+  }
+
+  //save tasks to local storage
+  function saveTasksToStorage(){
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  }
   // Initialize
   initCalendar();
