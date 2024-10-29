@@ -78,19 +78,38 @@ nextMonthButton.addEventListener("click", () => {
 function loadTasksForDay(dateKey) {
   taskList.innerHTML = ""; // Clear previous tasks
   const dayTasks = tasks[dateKey] || []; // Retrieve tasks for the specific dateKey only
-  dayTasks.forEach((task, index) => {
-    const li = document.createElement("li");
-    li.textContent = task;
-    li.classList.add("task");
 
-    // Add a delete button to each task
+  dayTasks.forEach((task, index) => {
+    // Create a wrapper div to hold the task and the delete button
+    const taskWrapper = document.createElement("div");
+    taskWrapper.classList.add("task-wrapper");
+
+    // Create a task element
+    const taskElement = document.createElement("span");
+    taskElement.textContent = task;
+    taskElement.classList.add("task");
+
+    // Create a delete button
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "✖";
     deleteButton.classList.add("delete-task");
+    deleteButton.style.display = "none"; // Initially hidden
     deleteButton.addEventListener("click", () => deleteTask(dateKey, index));
 
-    li.appendChild(deleteButton);
-    taskList.appendChild(li);
+    // Append the task and delete button to the wrapper
+    taskWrapper.appendChild(taskElement);
+    taskWrapper.appendChild(deleteButton);
+    
+    // Show delete button on hover
+    taskWrapper.addEventListener("mouseenter", () => {
+      deleteButton.style.display = "inline"; // Show on hover
+    });
+    taskWrapper.addEventListener("mouseleave", () => {
+      deleteButton.style.display = "none"; // Hide when not hovering
+    });
+
+    // Append the wrapper to the task list
+    taskList.appendChild(taskWrapper);
   });
 }
 

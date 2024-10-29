@@ -71,3 +71,13 @@
     padding: 5px;
     border-bottom: 1px solid #ddd;
   }
+
+  .task-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .delete-task {
+    margin-left: 10px;
+  }
