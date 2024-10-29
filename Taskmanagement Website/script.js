@@ -96,6 +96,16 @@ function loadTasksForDay(dateKey) {
 
 // Add Task
 addTaskButton.addEventListener("click", () => {
+  addTask();
+});
+
+taskInput.addEventListener("keydown", (event) => {
+  if(event.key =="Enter"){
+    addTask();
+  }
+});
+
+function addTask(){
   const task = taskInput.value.trim();
   if (task) {
     const dateKey = getDateKey(selectedDate); // Use selectedDate for adding tasks
@@ -107,7 +117,7 @@ addTaskButton.addEventListener("click", () => {
     saveTasksToStorage();
     loadTasksForDay(dateKey); // Reload tasks for the selected day
   }
-});
+}
 
 // Delete Task
 function deleteTask(date, index) {
