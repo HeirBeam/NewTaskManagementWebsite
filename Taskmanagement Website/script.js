@@ -15,6 +15,9 @@ function initCalendar() {
         const month = currentDate.getMonth();
         monthYear.textContent = `${currentDate.toLocaleString("default", { month: "long" })} ${year}`;
         renderDays(year, month);
+
+        //load tasks
+        loadTasksForDay(getDateKey(currentDate));
     }
 
 // Render Days in Calendar
@@ -99,6 +102,10 @@ function renderDays(year, month) {
   function saveTasksToStorage(){
     localStorage.setItem("tasks", JSON.stringify(tasks));
 
+  }
+
+  function getDateKey(date) {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   }
   // Initialize
   initCalendar();
