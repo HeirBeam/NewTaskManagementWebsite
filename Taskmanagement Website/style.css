@@ -1,0 +1,67 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f5;
+  }
+  
+  .container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .calendar, .task-manager {
+    width: 300px;
+  }
+  
+  .calendar header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .weekdays, .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+  }
+  
+  .days-grid div {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .task-manager {
+    border-left: 1px solid #ddd;
+    padding-left: 20px;
+  }
+  
+  #task-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  #task-list {
+    list-style: none;
+  }
+  
+  .task {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+  }
