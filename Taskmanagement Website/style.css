@@ -45,7 +45,13 @@
     padding: 10px;
     cursor: pointer;
   }
-  
+   /* Style for the selected day*/ 
+   .selected {
+    background-color: #4caf50;
+    color: white;
+    border-radius: 50%;
+   }
+   
   .task-manager {
     border-left: 1px solid #ddd;
     padding-left: 20px;
