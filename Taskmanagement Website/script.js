@@ -19,8 +19,8 @@ function initCalendar() {
     monthYear.textContent = `${currentDate.toLocaleString("default", { month: "long" })} ${year}`;
     renderDays(year, month);
     
-    // Load tasks for today's date on initialization
-    loadTasksForDay(getDateKey(currentDate)); // Load tasks for the current date
+    // Select and load tasks for today's date on initialization
+    selectDateByElement(currentDate); 
 }
 
 // Render Days in Calendar
@@ -41,15 +41,10 @@ function renderDays(year, month) {
 
         // Set initial selection if it's the current date
         if (year === currentDate.getFullYear() && month === currentDate.getMonth() && day === currentDate.getDate()) {
-          dayDiv.classList.add("current-date"); // Highlight current date
-          currentDateElement = dayDiv; // Track current date element
-      }
-
-      // Highlight selected date
-      if (year === selectedDate.getFullYear() && month === selectedDate.getMonth() && day === selectedDate.getDate()) {
-          dayDiv.classList.add("selected"); // Highlight selected date
-          selectedDateElement = dayDiv; // Track selected date element
-      }
+            dayDiv.classList.add("current-date", "selected"); // Highlight and select current date
+            currentDateElement = dayDiv; // Track current date element
+            selectedDateElement = dayDiv; // Set selected date element
+        }
 
         // Add click event to select the date
         dayDiv.addEventListener("click", () => {
@@ -57,9 +52,6 @@ function renderDays(year, month) {
         });
 
         daysGrid.appendChild(dayDiv);
-    }
-    if (currentDateElement) {
-      currentDateElement.classList.add("highlight");
     }
 }
 
@@ -71,12 +63,8 @@ function selectDate(dayElement, date) {
 
     // Highlight the current date
     if (currentDateElement) {
-        currentDateElement.classList.remove("selected"); // Keep highlight on the current date
-    }
-
-    if (currentDateElement){
-      currentDateElement.classList.remove("highlight");
-      currentDateElement.classList.add("current-date");
+        currentDateElement.classList.remove("selected");
+        currentDateElement.classList.add("current-date");
     }
 
     dayElement.classList.add("selected");
@@ -86,10 +74,26 @@ function selectDate(dayElement, date) {
     loadTasksForDay(getDateKey(selectedDate));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const currentDate = new Date();
-    renderDays(currentDate.getFullYear(), currentDate.getMonth()); // Call renderDays to show the current month
-});
+// Select the current date on initial load
+function selectDateByElement(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+
+    // Ensure the calendar is rendering the current month
+    if (currentDate.getMonth() !== month || currentDate.getFullYear() !== year) {
+        currentDate = new Date(year, month);
+        initCalendar();
+    }
+
+    // Automatically find and select the date element in the current month view
+    const dayElement = Array.from(daysGrid.children).find(
+        (el) => el.textContent == day && el.classList.contains("day")
+    );
+    if (dayElement) {
+        selectDate(dayElement, date);
+    }
+}
 
 // Change Month
 prevMonthButton.addEventListener("click", () => {
@@ -144,26 +148,18 @@ document.getElementById("task-input").addEventListener("keydown", (event) => {
 });
 
 function addTask() {
-  const taskInput = document.getElementById("task-input");
-  const task = taskInput.value.trim();
-  if (task) {
-      const dateKey = getDateKey(selectedDate); // Use selectedDate for adding tasks
-      tasks[dateKey] = tasks[dateKey] || [];
-      tasks[dateKey].push(task);
-      taskInput.value = "";
+    const taskInput = document.getElementById("task-input");
+    const task = taskInput.value.trim();
+    if (task) {
+        const dateKey = getDateKey(selectedDate); // Use selectedDate for adding tasks
+        tasks[dateKey] = tasks[dateKey] || [];
+        tasks[dateKey].push(task);
+        taskInput.value = "";
 
-      // Save tasks to localStorage
-      saveTasksToStorage();
-      loadTasksForDay(dateKey); // Reload tasks for the selected day
-  }
-}
-
-// Delete Task
-function deleteTask(date, index) {
-    tasks[date].splice(index, 1); // Remove the task
-    if (tasks[date].length === 0) delete tasks[date]; // Remove empty date entries
-    saveTasksToStorage(); // Save updated tasks to localStorage
-    loadTasksForDay(date); // Reload tasks for the selected day
+        // Save tasks to localStorage
+        saveTasksToStorage();
+        loadTasksForDay(dateKey); // Reload tasks for the selected day
+    }
 }
 
 // Load tasks from localStorage
@@ -182,19 +178,6 @@ function getDateKey(date) {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
-// Navigate to the previous month
-function prevMonth() {
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  renderDays(currentDate.getFullYear(), currentDate.getMonth());
-  loadTasksForDay(getDateKey(currentDate)); // Load tasks for the current date
-}
-
-// Navigate to the next month
-function nextMonth() {
-  currentDate.setMonth(currentDate.getMonth() + 1);
-  renderDays(currentDate.getFullYear(), currentDate.getMonth());
-  loadTasksForDay(getDateKey(currentDate)); // Load tasks for the current date
-}
-
 // Initialize
 document.addEventListener("DOMContentLoaded", initCalendar);
+ 
