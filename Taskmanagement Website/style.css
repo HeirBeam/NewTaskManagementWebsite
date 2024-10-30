@@ -185,17 +185,37 @@
   width: 45%;
 }
 
+/* General styling for time inputs */
+#start-time, #due-time {
+  width: 80px; /* Set a fixed width to align both inputs */
+  padding: 6px;
+  margin-right: 8px; /* Space between start and due time */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 14px;
+  text-align: center; /* Center-align text for better readability */
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+/* Focus effect for time inputs */
+#start-time:focus, #due-time:focus {
+  outline: none;
+  border-color: #4CAF50; /* Highlight color on focus */
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.5); /* Slight shadow on focus */
+}
+
+/* Styling for the add-task button to align with inputs */
 #add-task {
-  padding: 8px 12px;
+  padding: 6px 12px;
   background-color: #4CAF50;
-  color: #fff;
+  color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
-  align-self: flex-end; /* Aligns the button to the right */
-  margin-top: 5px;
+  transition: background-color 0.3s ease;
 }
 
 #add-task:hover {
-  background-color: #45a049;
+  background-color: #45a049; /* Darken on hover */
 }

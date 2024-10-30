@@ -152,9 +152,16 @@ function loadTasksForDay(dateKey) {
         taskElement.classList.add("task");
 
         let taskText = task.text;
-        if (task.startTime || task.dueTime) {
-            taskText += ` (${task.startTime || ""} - ${task.dueTime || ""})`.replace(/ - $|^\(\s*-\s*\)/, "");
+
+        // Determine the time label based on availability of start and due times
+        if (task.startTime && task.dueTime) {
+            taskText += ` (Start: ${task.startTime} - Due: ${task.dueTime})`;
+        } else if (task.startTime) {
+            taskText += ` (Start: ${task.startTime})`;
+        } else if (task.dueTime) {
+            taskText += ` (Due: ${task.dueTime})`;
         }
+
         taskElement.textContent = taskText;
 
         const deleteButton = document.createElement("button");
@@ -180,54 +187,61 @@ function loadTasksForDay(dateKey) {
     });
 }
 
-// Add Task
-document.getElementById("add-task").addEventListener("click", addTask);
-document.getElementById("task-input").addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        addTask();
-    }
-});
 
+
+// Updated addTask function
+// Updated addTask function with time validation
 function addTask() {
     const taskText = document.getElementById("task-input").value.trim();
-    const startTime = document.getElementById("start-time").value;
-    const dueTime = document.getElementById("due-time").value;
+    let startTime = document.getElementById("start-time").value;
+    let dueTime = document.getElementById("due-time").value;
+
+    if (!taskText) {
+        alert("Please enter a task description.");
+        return;
+    }
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+    today.setHours(0, 0, 0, 0);
 
-    // Prevent adding tasks to past dates
     if (selectedDate < today) {
         alert("You cannot add tasks for past dates.");
         return;
     }
 
-    if (taskText) {
-        const dateKey = getDateKey(selectedDate);
-        tasks[dateKey] = tasks[dateKey] || [];
+    // Process start and due times only if they are non-empty
+    startTime = startTime ? formatTimeInput(startTime) : null;
+    dueTime = dueTime ? formatTimeInput(dueTime) : null;
 
-        // Add task with optional start and due times
-        tasks[dateKey].push({
-            text: taskText,
-            startTime: startTime || null,
-            dueTime: dueTime || null,
-        });
-
-        // Clear input fields after adding
-        document.getElementById("task-input").value = "";
-        document.getElementById("start-time").value = "";
-        document.getElementById("due-time").value = "";
-
-        // Save tasks to localStorage and refresh the calendar to update the task indicator
-        saveTasksToStorage();
-        initCalendar(); // Re-render the calendar to update task indicators
-        loadTasksForDay(dateKey); // Reload tasks for the selected day
-    } else {
-        alert("Please enter a task description.");
+    // If formatTimeInput returns `null` for invalid input, show an alert
+    if (startTime === null && document.getElementById("start-time").value) {
+        alert("Please enter a valid start time in HH or HH:MM format.");
+        return;
     }
+    if (dueTime === null && document.getElementById("due-time").value) {
+        alert("Please enter a valid due time in HH or HH:MM format.");
+        return;
+    }
+
+    const dateKey = getDateKey(selectedDate);
+    tasks[dateKey] = tasks[dateKey] || [];
+
+    // Add task with optional start and due times
+    tasks[dateKey].push({
+        text: taskText,
+        startTime: startTime || null,
+        dueTime: dueTime || null,
+    });
+
+    // Clear input fields after adding
+    document.getElementById("task-input").value = "";
+    document.getElementById("start-time").value = "";
+    document.getElementById("due-time").value = "";
+
+    saveTasksToStorage();
+    initCalendar();
+    loadTasksForDay(dateKey);
 }
-
-
 
 // Delete Task
 function deleteTask(dateKey, index) {
@@ -257,5 +271,77 @@ function getDateKey(date) {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
+function autoCompleteTime(timeInput) {
+    if (timeInput.value && timeInput.value.match(/^\d{1,2}$/)) {
+        // Append ":00" if only an hour is provided (e.g., "12" becomes "12:00")
+        timeInput.value += ":00";
+    }
+}
+
+function formatTimeInput(time) {
+    // Handle hour-only input like "12" to "12:00"
+    if (time.match(/^\d{1,2}$/)) {
+        return time + ":00";
+    }
+    // Handle four-digit input like "1230" to "12:30"
+    else if (time.match(/^\d{4}$/)) {
+        return time.slice(0, 2) + ":" + time.slice(2, 4);
+    }
+    // Handle valid "HH:MM" format
+    else if (time.match(/^\d{1,2}:\d{2}$/)) {
+        return time;
+    }
+    // Return null if format is invalid
+    return null;
+}
 // Initialize
-document.addEventListener("DOMContentLoaded", initCalendar);
+document.addEventListener("DOMContentLoaded", () => {
+    initCalendar();
+
+    const taskInput = document.getElementById("task-input");
+    const startTimeInput = document.getElementById("start-time");
+    const dueTimeInput = document.getElementById("due-time");
+    const addTaskButton = document.getElementById("add-task");
+
+    // Bind the Add Task button to the addTask function
+    addTaskButton.addEventListener("click", () => addTask());
+
+    // Restrict input to numbers and colon
+    const restrictTimeInput = (inputField) => {
+        inputField.addEventListener("input", () => {
+            inputField.value = inputField.value.replace(/[^0-9:]/g, ""); // Allow only numbers and colon
+        });
+    };
+
+    // Apply restriction to start and due time inputs
+    restrictTimeInput(startTimeInput);
+    restrictTimeInput(dueTimeInput);
+
+    // Shift focus to due time when pressing Enter on start time
+    startTimeInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            dueTimeInput.focus();
+        }
+    });
+
+    // Add task when pressing Enter on due time
+    dueTimeInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            addTask();
+        }
+    });
+
+    // Add task on Enter in task description if there's text
+    taskInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            if (taskInput.value.trim() !== "") {
+                addTask();
+            } else {
+                alert("Please enter a task description.");
+            }
+        }
+    });
+});
