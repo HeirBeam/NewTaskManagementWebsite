@@ -37,10 +37,10 @@ function renderDays(year, month) {
 
     for (let day = 1; day <= daysInMonth; day++) {
         const dayDiv = document.createElement("div");
-        dayDiv.textContent = day;
         dayDiv.classList.add("day");
 
         const date = new Date(year, month, day);
+        const dateKey = getDateKey(date);
 
         // Highlight today’s date only if viewing the current month
         if (
@@ -49,11 +49,21 @@ function renderDays(year, month) {
             day === currentDate.getDate()
         ) {
             dayDiv.classList.add("current-date");
-        } 
-        // Mark past dates with a "crossed-date" class and an "X", but exclude the current date
-        else if (date < currentDate) {
+        }
+
+        // Mark past dates with a "crossed-date" class and an "X"
+        if (date < currentDate && !(date.getDate() === currentDate.getDate() && date.getMonth() === currentDate.getMonth() && date.getFullYear() === currentDate.getFullYear())) {
             dayDiv.classList.add("crossed-date");
             dayDiv.innerHTML = `<span class="cross-text"></span> ${day}`;
+        } else {
+            dayDiv.textContent = day; // For non-past dates, just show the day number
+        }
+
+        // Add a small dot indicator if there are tasks for this date
+        if (tasks[dateKey]) {
+            const taskIndicator = document.createElement("span");
+            taskIndicator.classList.add("task-indicator");
+            dayDiv.appendChild(taskIndicator);
         }
 
         // Highlight the selected date
@@ -74,7 +84,6 @@ function renderDays(year, month) {
         daysGrid.appendChild(dayDiv);
     }
 }
-
 
 // Select a date and load tasks for that day
 function selectDate(dayElement, date) {
@@ -132,35 +141,39 @@ function changeMonth(offset) {
 // Load Tasks for Selected Day
 function loadTasksForDay(dateKey) {
     taskList.innerHTML = ""; // Clear previous tasks
-    const dayTasks = tasks[dateKey] || []; // Retrieve tasks for the specific dateKey only
+    const dayTasks = tasks[dateKey] || [];
 
     dayTasks.forEach((task, index) => {
         const taskWrapper = document.createElement("div");
         taskWrapper.classList.add("task-wrapper");
 
+        // Display the task text with optional start and due times
         const taskElement = document.createElement("span");
-        taskElement.textContent = task;
         taskElement.classList.add("task");
+
+        let taskText = task.text;
+        if (task.startTime || task.dueTime) {
+            taskText += ` (${task.startTime || ""} - ${task.dueTime || ""})`.replace(/ - $|^\(\s*-\s*\)/, "");
+        }
+        taskElement.textContent = taskText;
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "✖";
         deleteButton.classList.add("delete-task");
-        deleteButton.style.display = "none"; // Initially hidden
+        deleteButton.style.display = "none";
 
         // Show delete button on hover
         taskWrapper.addEventListener("mouseenter", () => {
-            deleteButton.style.display = "inline"; // Show on hover
+            deleteButton.style.display = "inline";
         });
         taskWrapper.addEventListener("mouseleave", () => {
-            deleteButton.style.display = "none"; // Hide when not hovering
+            deleteButton.style.display = "none";
         });
 
-        // Delete task on click
         deleteButton.addEventListener("click", () => {
             deleteTask(dateKey, index);
         });
 
-        // Append the task and delete button to the wrapper
         taskWrapper.appendChild(taskElement);
         taskWrapper.appendChild(deleteButton);
         taskList.appendChild(taskWrapper);
@@ -176,37 +189,58 @@ document.getElementById("task-input").addEventListener("keydown", (event) => {
 });
 
 function addTask() {
-    const task = taskInput.value.trim();
+    const taskText = document.getElementById("task-input").value.trim();
+    const startTime = document.getElementById("start-time").value;
+    const dueTime = document.getElementById("due-time").value;
 
-    // Check if the selected date is in the past
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+
+    // Prevent adding tasks to past dates
     if (selectedDate < today) {
-        alert("You cannot add tasks for past dates."); // Optional: display an alert
-        return; // Exit the function without adding the task
+        alert("You cannot add tasks for past dates.");
+        return;
     }
 
-    if (task) {
-        const dateKey = getDateKey(selectedDate); // Use selectedDate for adding tasks
+    if (taskText) {
+        const dateKey = getDateKey(selectedDate);
         tasks[dateKey] = tasks[dateKey] || [];
-        tasks[dateKey].push(task);
-        taskInput.value = "";
 
-        // Save tasks to localStorage
+        // Add task with optional start and due times
+        tasks[dateKey].push({
+            text: taskText,
+            startTime: startTime || null,
+            dueTime: dueTime || null,
+        });
+
+        // Clear input fields after adding
+        document.getElementById("task-input").value = "";
+        document.getElementById("start-time").value = "";
+        document.getElementById("due-time").value = "";
+
+        // Save tasks to localStorage and refresh the calendar to update the task indicator
         saveTasksToStorage();
+        initCalendar(); // Re-render the calendar to update task indicators
         loadTasksForDay(dateKey); // Reload tasks for the selected day
+    } else {
+        alert("Please enter a task description.");
     }
 }
+
 
 
 // Delete Task
 function deleteTask(dateKey, index) {
     tasks[dateKey].splice(index, 1); // Remove the task
     if (tasks[dateKey].length === 0) delete tasks[dateKey]; // Remove empty date entries
-    saveTasksToStorage(); // Save updated tasks to localStorage
+
+    // Save updated tasks to localStorage
+    saveTasksToStorage();
+
+    // Re-render the calendar to update task indicators and reflect task deletion
+    initCalendar();
     loadTasksForDay(dateKey); // Reload tasks for the selected day
 }
-
 // Load tasks from localStorage
 function loadTasksFromStorage() {
     const storedTasks = localStorage.getItem("tasks");

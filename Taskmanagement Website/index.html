@@ -23,12 +23,18 @@
 
             <!--THsi is for the tasks section-->
             <section class="task-manager">
-                <h2>Tasks</h2>
-                <div id="task-form">
-                    <input type="text" id="task-input" placeholder="Add a task...">
+                <div class="task-input-container">
+                    <input type="text" id="task-input" placeholder="Enter task" />
+                    <div class="time-inputs">
+                        <label for="start-time">Start:</label>
+                        <input type="time" id="start-time" placeholder="Start time (optional)" />
+                        <label for="due-time">Due:</label>
+                        <input type="time" id="due-time" placeholder="Due time (optional)" />
+                    </div>
                     <button id="add-task">Add Task</button>
                 </div>
-                <ul id="task-list"></ul>
+                <div id="task-list"></div>
+                
             </section>
         </div>
         <script src="script.js"></script>
