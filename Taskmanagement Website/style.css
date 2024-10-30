@@ -45,12 +45,28 @@
     padding: 10px;
     cursor: pointer;
   }
-   /* Style for the selected day*/ 
-   .selected {
-    background-color: #4caf50;
-    color: white;
-    border-radius: 50%;
-   }
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for the days of the week */
+    gap: 5px; /* Space between day elements */
+}
+
+.day {
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #ccc; /* Optional: Add borders for visual separation */
+}
+
+.current-date {
+  background-color: rgba(255, 255, 0, 0.5); /* Dim yellow background for current date */
+}
+
+.selected {
+  background-color: blue; /* Bright blue background for the selected date */
+  color: white; /* Change text color to white for better visibility */
+}
+
    
   .task-manager {
     border-left: 1px solid #ddd;
