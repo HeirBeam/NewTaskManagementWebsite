@@ -40,6 +40,8 @@ function renderDays(year, month) {
         dayDiv.textContent = day;
         dayDiv.classList.add("day");
 
+        const date = new Date(year, month, day);
+
         // Highlight today’s date only if viewing the current month
         if (
             year === currentDate.getFullYear() &&
@@ -47,6 +49,11 @@ function renderDays(year, month) {
             day === currentDate.getDate()
         ) {
             dayDiv.classList.add("current-date");
+        } 
+        // Mark past dates with a "crossed-date" class and an "X", but exclude the current date
+        else if (date < currentDate) {
+            dayDiv.classList.add("crossed-date");
+            dayDiv.innerHTML = `<span class="cross-text"></span> ${day}`;
         }
 
         // Highlight the selected date
@@ -61,12 +68,13 @@ function renderDays(year, month) {
 
         // Add click event to select the date
         dayDiv.addEventListener("click", () => {
-            selectDate(dayDiv, new Date(year, month, day));
+            selectDate(dayDiv, date);
         });
 
         daysGrid.appendChild(dayDiv);
     }
 }
+
 
 // Select a date and load tasks for that day
 function selectDate(dayElement, date) {
@@ -169,6 +177,15 @@ document.getElementById("task-input").addEventListener("keydown", (event) => {
 
 function addTask() {
     const task = taskInput.value.trim();
+
+    // Check if the selected date is in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+    if (selectedDate < today) {
+        alert("You cannot add tasks for past dates."); // Optional: display an alert
+        return; // Exit the function without adding the task
+    }
+
     if (task) {
         const dateKey = getDateKey(selectedDate); // Use selectedDate for adding tasks
         tasks[dateKey] = tasks[dateKey] || [];
@@ -180,6 +197,7 @@ function addTask() {
         loadTasksForDay(dateKey); // Reload tasks for the selected day
     }
 }
+
 
 // Delete Task
 function deleteTask(dateKey, index) {

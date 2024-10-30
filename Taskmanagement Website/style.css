@@ -67,6 +67,33 @@
   color: white; /* Change text color to white for better visibility */
 }
 
+.day.crossed-date {
+  position: relative;
+  color: #aaa; /* Make the date text invisible but still clickable */
+}
+
+.day.crossed-date::before,
+.day.crossed-date::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 2px; /* Thickness of the cross lines */
+  background-color: rgba(255, 0, 0, 0.6); /* Semi-transparent red */
+  transform-origin: center;
+  pointer-events: none; /* Prevent interaction with the cross */
+}
+
+.day.crossed-date::before {
+  transform: translate(-50%, -50%) rotate(45deg); /* Diagonal line */
+}
+
+.day.crossed-date::after {
+  transform: translate(-50%, -50%) rotate(-45deg); /* Opposite diagonal line */
+}
+
+
    
   .task-manager {
     border-left: 1px solid #ddd;
