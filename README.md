@@ -61,7 +61,7 @@ To run this project locally, you only need a web browser.
 ## File Structure
 
 ```plaintext
-calendar-task-manager/
+Taskmanagement Website/
 │
 ├── index.html       # Main HTML file with calendar and task manager sections
 ├── style.css        # CSS file for styling the calendar and task manager
