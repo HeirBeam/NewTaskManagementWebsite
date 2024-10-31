@@ -213,14 +213,24 @@ function addTask() {
     startTime = startTime ? formatTimeInput(startTime) : null;
     dueTime = dueTime ? formatTimeInput(dueTime) : null;
 
-    // If formatTimeInput returns `null` for invalid input, show an alert
-    if (startTime === null && document.getElementById("start-time").value) {
-        alert("Please enter a valid start time in HH or HH:MM format.");
-        return;
-    }
-    if (dueTime === null && document.getElementById("due-time").value) {
-        alert("Please enter a valid due time in HH or HH:MM format.");
-        return;
+    // If times are in "morning to afternoon" format, adjust dueTime to PM
+    if (startTime && dueTime) {
+        const [startHour] = startTime.split(":").map(Number);
+        const [dueHour] = dueTime.split(":").map(Number);
+
+        // If the start hour is AM and due hour is earlier, assume PM for due hour
+        if (startHour < 12 && dueHour < 12 && dueHour < startHour) {
+            dueTime = (dueHour + 12) + ":00"; // Convert to PM format (e.g., "3" becomes "15:00")
+        }
+
+        // Validate that due time is not earlier than start time
+        const startTotalMinutes = startHour * 60 + parseInt(startTime.split(":")[1], 10);
+        const dueTotalMinutes = (dueHour + (dueHour < startHour ? 12 : 0)) * 60 + parseInt(dueTime.split(":")[1], 10);
+
+        if (dueTotalMinutes < startTotalMinutes) {
+            alert("The due time cannot be earlier than the start time.");
+            return;
+        }
     }
 
     const dateKey = getDateKey(selectedDate);
@@ -240,6 +250,10 @@ function addTask() {
 
     saveTasksToStorage();
     initCalendar();
+    
+    document.getElementById("add-task-form").style.display = "none";
+    document.getElementById("task-list-container").style.display = "block";
+
     loadTasksForDay(dateKey);
 }
 
@@ -294,6 +308,12 @@ function formatTimeInput(time) {
     // Return null if format is invalid
     return null;
 }
+
+function isPastDate(date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today
+    return date < today;
+}
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
     initCalendar();
@@ -302,9 +322,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const startTimeInput = document.getElementById("start-time");
     const dueTimeInput = document.getElementById("due-time");
     const addTaskButton = document.getElementById("add-task");
+    const showAddTaskButton = document.getElementById("show-add-task");
+    const cancelAddTaskButton = document.getElementById("cancel-add-task");
+    const addTaskForm = document.getElementById("add-task-form");
+    const taskListContainer = document.getElementById("task-list-container");
+
+    // Modify the Add Task button to check for past date
+    showAddTaskButton.addEventListener("click", () => {
+        if (isPastDate(selectedDate)) {
+            alert("You cannot add tasks for past dates.");
+        } else {
+            addTaskForm.style.display = "block";
+            taskListContainer.style.display = "none"; // Hide task list temporarily
+        }
+    });
+
+    // Hide the add task form and show the task list when "Cancel" button is clicked
+    cancelAddTaskButton.addEventListener("click", () => {
+        addTaskForm.style.display = "none";
+        taskListContainer.style.display = "block";
+    });
 
     // Bind the Add Task button to the addTask function
-    addTaskButton.addEventListener("click", () => addTask());
+    addTaskButton.addEventListener("click", () => {
+        addTask();
+    });
 
     // Restrict input to numbers and colon
     const restrictTimeInput = (inputField) => {

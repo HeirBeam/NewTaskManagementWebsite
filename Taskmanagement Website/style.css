@@ -1,89 +1,92 @@
+/* Universal Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f5;
-  }
-  
-  .container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .calendar, .task-manager {
-    width: 300px;
-  }
-  
-  .calendar header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-  }
-  
-  .weekdays, .days-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    text-align: center;
-  }
-  
-  .days-grid div {
-    padding: 10px;
-    cursor: pointer;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+/* Body Styling */
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f5;
+}
+
+/* Main Container Styling */
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Calendar and Task Manager Section Width */
+.calendar,
+.task-manager {
+  width: 300px;
+}
+
+/* Calendar Header */
+.calendar header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+/* Grid Layout for Weekdays and Days */
+.weekdays,
+.days-grid,
 #days-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
 }
 
-.day {
-    padding: 10px;
-    height: 50px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* Individual Day Styling */
+.day,
+.days-grid div {
+  padding: 10px;
+  cursor: pointer;
+  height: 50px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
+/* Special Indicators and Highlights */
 .task-indicator {
-    position: absolute;
-    bottom: 5px;
-    width: 8px;
-    height: 8px;
-    background-color: #ff6347; /* Red dot for indication */
-    border-radius: 50%;
+  position: absolute;
+  bottom: 5px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff6347;
+  border-radius: 50%;
 }
+
 .current-date {
-  background-color: rgba(255, 255, 0, 0.5); /* Dim yellow background for current date */
+  background-color: rgba(255, 255, 0, 0.5);
 }
 
 .selected {
-  background-color: blue; /* Bright blue background for the selected date */
-  color: white; /* Change text color to white for better visibility */
+  background-color: blue;
+  color: white;
 }
 
+/* Crossed Date Styling */
 .day.crossed-date {
-  position: relative;
-  color: #aaa; /* Make the date text invisible but still clickable */
+  color: #aaa;
 }
 
 .day.crossed-date::before,
@@ -93,43 +96,45 @@
   top: 50%;
   left: 50%;
   width: 100%;
-  height: 2px; /* Thickness of the cross lines */
-  background-color: rgba(255, 0, 0, 0.6); /* Semi-transparent red */
+  height: 2px;
+  background-color: rgba(255, 0, 0, 0.6);
   transform-origin: center;
-  pointer-events: none; /* Prevent interaction with the cross */
+  pointer-events: none;
 }
 
 .day.crossed-date::before {
-  transform: translate(-50%, -50%) rotate(45deg); /* Diagonal line */
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .day.crossed-date::after {
-  transform: translate(-50%, -50%) rotate(-45deg); /* Opposite diagonal line */
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-
-   
+/* Task Manager Styling */
 .task-manager {
   border-left: 1px solid #ddd;
   padding-left: 20px;
 }
-  
+
 #task-form {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
 }
-  
+
+/* Task List Styling */
 #task-list {
   list-style: none;
+  margin-bottom: 10px;
 }
-  
+
 .task {
   padding: 5px;
   border-bottom: 1px solid #ddd;
 }
 
-.task-wrapper{
+/* Task Wrapper */
+.task-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -139,12 +144,14 @@
   margin-left: 10px;
 }
 
+/* Time Info Styling */
 .time-info {
-  font-size:0.9em;
+  font-size: 0.9em;
   color: #666;
-  margin: left 5px;
+  margin-left: 5px;
 }
 
+/* Task Input Container */
 .task-input-container {
   display: flex;
   flex-direction: column;
@@ -165,57 +172,76 @@
   border-radius: 5px;
 }
 
+/* Time Inputs */
 .time-inputs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 10px;
-  width: 100%;
 }
 
 .time-inputs label {
   font-size: 0.9em;
   color: #333;
+  width: 80px; /* Ensure labels are aligned */
 }
 
-.time-inputs input[type="time"] {
+.time-inputs input[type="text"] {
   padding: 6px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 45%;
-}
-
-/* General styling for time inputs */
-#start-time, #due-time {
-  width: 80px; /* Set a fixed width to align both inputs */
-  padding: 6px;
-  margin-right: 8px; /* Space between start and due time */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px; /* Rounded corners */
+  width: 120px; /* Expanded width for clearer placeholder text */
+  text-align: center;
   font-size: 14px;
-  text-align: center; /* Center-align text for better readability */
-  box-sizing: border-box; /* Ensure padding doesn't affect width */
+  box-sizing: border-box;
 }
 
 /* Focus effect for time inputs */
-#start-time:focus, #due-time:focus {
+#start-time:focus,
+#due-time:focus {
   outline: none;
-  border-color: #4CAF50; /* Highlight color on focus */
-  box-shadow: 0 0 4px rgba(76, 175, 80, 0.5); /* Slight shadow on focus */
+  border-color: #4CAF50;
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.5);
 }
-
-/* Styling for the add-task button to align with inputs */
-#add-task {
+/* Button Styling */
+#add-task,
+#show-add-task,
+#cancel-add-task {
+  margin-top: 10px;
   padding: 6px 12px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  border-radius: 4px;
+  border: none;
+  color: white;
+}
+
+#add-task,
+#show-add-task {
+  background-color: #4CAF50;
 }
 
 #add-task:hover {
-  background-color: #45a049; /* Darken on hover */
+  background-color: #45a049;
+}
+
+#cancel-add-task {
+  background-color: #f44336;
+  margin-left: 5px;
+}
+
+/* Task List Container */
+#task-list-container {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#add-task-form {
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #eef;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
